@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Parcelas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-background">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+    </div>
+
+    <div class="app-container">
+        <header class="app-header fade-in">
+            <h1>Escolha as parcelas</h1>
+            <p>Simulação com taxas aplicadas</p>
+        </header>
+        
+        <main class="main-content">
+            <div class="input-section fade-in" style="animation-delay: 0.1s;">
+                <label for="amount">Qual o valor do produto?</label>
+                <div class="input-wrapper">
+                    <span class="currency-symbol">R$</span>
+                    <input type="number" id="amount" placeholder="0,00" step="0.01">
+                </div>
+
+                <!-- Novo campo de Taxa Adicional -->
+                <div id="extra-tax-container" style="display: none; flex-direction: column; align-items: center; width: 100%; margin-top: 24px; animation: fadeIn 0.3s ease;">
+                    <label for="extra-tax" style="font-size: 0.95rem; margin-bottom: 4px;">Adicionar taxa extra? (Opcional)</label>
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 12px; max-width: 80%; line-height: 1.3;">Essa taxa será somada ao valor final repassado ao cliente.</span>
+                    <div class="input-wrapper" style="max-width: 200px; padding: 10px 16px;">
+                        <input type="number" id="extra-tax" placeholder="0" step="0.01">
+                        <span class="currency-symbol" style="margin-left: 8px; margin-right: 0;">%</span>
+                    </div>
+                </div>
+
+                <!-- Toggle de Descontar/Repassar -->
+                <div class="tax-mode-toggle" style="margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                    <label class="mode-radio" style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; background: var(--bg-base); padding: 14px 20px; border-radius: var(--radius-md); border: 1px solid var(--primary); box-shadow: var(--shadow-glow); flex: 1; min-width: 240px; transition: all 0.2s;">
+                        <input type="radio" name="tax_mode" value="discount" checked style="width: 20px; height: 20px; accent-color: var(--primary); margin-top: 2px;">
+                        <div style="display: flex; flex-direction: column; text-align: left;">
+                            <span style="font-weight: 600; font-size: 1rem; color: var(--text-primary); margin-bottom: 2px;">Descontar taxa</span>
+                            <span style="font-size: 0.85rem; color: var(--text-secondary);">O cliente paga o valor inserido. Mostra quanto você vai receber.</span>
+                        </div>
+                    </label>
+                    <label class="mode-radio" style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; background: var(--bg-base); padding: 14px 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); flex: 1; min-width: 240px; transition: all 0.2s;">
+                        <input type="radio" name="tax_mode" value="add" style="width: 20px; height: 20px; accent-color: var(--primary); margin-top: 2px;">
+                        <div style="display: flex; flex-direction: column; text-align: left;">
+                            <span style="font-weight: 600; font-size: 1rem; color: var(--text-primary); margin-bottom: 2px;">Repassar taxa</span>
+                            <span style="font-size: 0.85rem; color: var(--text-secondary);">Você recebe o valor inserido. Mostra quanto o cliente deve pagar.</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="layout-grid">
+                <!-- Left side: Installments -->
+                <div class="left-column">
+                    <div class="brand-selection fade-in" style="animation-delay: 0.15s; margin-bottom: 24px; background: var(--bg-surface); padding: 20px 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+                        <label style="display: block; margin-bottom: 16px; font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Bandeira do Cartão</label>
+                        <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                            <label class="brand-radio" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                <input type="radio" name="card_brand" value="visa_master" checked style="width: 18px; height: 18px; accent-color: var(--primary);">
+                                <div style="display: flex; align-items: center; margin-left: 2px;">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="9" cy="12" r="6" fill="#eb001b" fill-opacity="0.8"/>
+                                        <circle cx="15" cy="12" r="6" fill="#f79e1b" fill-opacity="0.8"/>
+                                    </svg>
+                                </div>
+                                <span style="font-weight: 500;">Visa / Mastercard</span>
+                            </label>
+                            <label class="brand-radio" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                <input type="radio" name="card_brand" value="other" style="width: 18px; height: 18px; accent-color: var(--primary);">
+                                <div style="display: flex; align-items: center; margin-left: 2px; color: var(--text-secondary);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                                </div>
+                                <span style="font-weight: 500;">Outras Bandeiras</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <section class="installments-section fade-in" style="animation-delay: 0.2s;">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <!-- SVG for credit card -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                        </div>
+                        <span class="card-brand">Cartão de Crédito</span>
+                    </div>
+                    <div class="installments-grid" id="installments-container">
+                        <!-- Filled by JS -->
+                    </div>
+                    </section>
+                </div>
+                
+                <!-- Right side: Summary -->
+                <aside class="summary-section fade-in" style="animation-delay: 0.3s;">
+                    <div class="summary-card glassmorphism" id="summary-card">
+                        <h2>Resumo da simulação</h2>
+                        <div class="summary-details">
+                            <div class="summary-row">
+                                <span>Valor Base</span>
+                                <span id="summary-product">R$ 0,00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span id="summary-tax-label">Taxas (0%)</span>
+                                <span id="summary-tax-value" style="color: #ef4444;">- R$ 0,00</span>
+                            </div>
+                            <div class="summary-row" style="margin-top: 4px;">
+                                <span>Parcelas selecionadas</span>
+                                <span id="summary-installments" style="font-weight: 600; color: var(--primary);">1x</span>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-divider"></div>
+                        
+                        <div class="summary-row" style="margin-bottom: 16px;">
+                            <span style="font-weight: 500;">O cliente paga</span>
+                            <span id="summary-buyer" style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">R$ 0,00</span>
+                        </div>
+                        
+                        <div class="summary-total" style="margin-bottom: 0;">
+                            <span>Você recebe</span>
+                            <div class="total-price-wrapper">
+                                <span id="summary-seller" class="total-price-value" style="color: var(--success);">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
