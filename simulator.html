@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="simulator.css">
 </head>
+
 <body>
     <div class="app-background">
         <div class="glow glow-1"></div>
@@ -25,27 +27,40 @@
             <h1 style="font-size: 2.2rem;">Margem de Lucro Real</h1>
             <p>Descubra o lucro exato da sua venda após os custos e taxas</p>
         </header>
-        
+
         <main class="main-content">
             <div class="layout-grid">
                 <!-- Left side: Form -->
                 <div class="left-column simulator-left fade-in" style="animation-delay: 0.2s;">
-                    
+
                     <!-- Products Section -->
                     <section class="simulator-section">
                         <div class="section-header">
                             <div class="icon-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path
+                                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                    </path>
+                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                </svg>
                             </div>
                             <h2>Produtos Vendidos</h2>
                         </div>
-                        
+
                         <div id="products-container" class="items-container">
                             <!-- JS vai preencher as linhas de produtos aqui -->
                         </div>
-                        
+
                         <button id="add-product-btn" class="btn-secondary mt-16">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
                             Adicionar Produto
                         </button>
                     </section>
@@ -53,60 +68,127 @@
                     <!-- Trade-in Section -->
                     <section class="simulator-section mt-24">
                         <div class="section-header">
-                            <div class="icon-wrapper" style="color: var(--success); background: rgba(16, 185, 129, 0.1);">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+                            <div class="icon-wrapper"
+                                style="color: var(--success); background: rgba(16, 185, 129, 0.1);">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path
+                                        d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" />
+                                </svg>
                             </div>
-                            <h2>Aparelhos na Retoma (Troca)</h2>
+                            <h2>Aparelhos na Troca</h2>
                             <span class="optional-badge">Opcional</span>
                         </div>
-                        
+
                         <div id="tradein-container" class="items-container">
                             <!-- JS vai preencher as linhas de retoma aqui -->
                         </div>
-                        
+
                         <button id="add-tradein-btn" class="btn-secondary mt-16">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            Adicionar Retoma
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Adicionar Troca
                         </button>
                     </section>
-                    
+
                     <!-- Payment Fees Section -->
                     <section class="simulator-section mt-24">
                         <div class="section-header">
                             <div class="icon-wrapper" style="color: #f79e1b; background: rgba(247, 158, 27, 0.1);">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                                </svg>
                             </div>
-                            <h2>Meio de Pagamento (Cartão)</h2>
+                            <h2>Meio de Pagamento</h2>
                         </div>
-                        
+
                         <div class="payment-setup">
                             <!-- Payment Method Selection -->
                             <div class="payment-methods" style="margin-bottom: 24px; display: flex; gap: 12px;">
-                                <button class="btn-secondary payment-method-btn" data-method="pix" style="flex: 1; padding: 12px; font-size: 0.95rem;">Pix (0%)</button>
-                                <button class="btn-secondary payment-method-btn" data-method="debito" style="flex: 1; padding: 12px; font-size: 0.95rem;">Débito</button>
-                                <button class="btn-secondary payment-method-btn active" data-method="credito" style="flex: 1; padding: 12px; font-size: 0.95rem; border-color: var(--primary); background: rgba(99, 102, 241, 0.1); color: var(--primary);">Crédito</button>
+                                <button class="btn-secondary payment-method-btn" data-method="pix"
+                                    style="flex: 1; padding: 12px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M5.283 18.36a3.505 3.505 0 0 0 2.493-1.032l3.6-3.6a.684.684 0 0 1 .946 0l3.613 3.613a3.504 3.504 0 0 0 2.493 1.032h.71l-4.56 4.56a3.647 3.647 0 0 1-5.156 0L4.85 18.36ZM18.428 5.627a3.505 3.505 0 0 0-2.493 1.032l-3.613 3.614a.67.67 0 0 1-.946 0l-3.6-3.6A3.505 3.505 0 0 0 5.283 5.64h-.434l4.573-4.572a3.646 3.646 0 0 1 5.156 0l4.559 4.559ZM1.068 9.422 3.79 6.699h1.492a2.483 2.483 0 0 1 1.744.722l3.6 3.6a1.73 1.73 0 0 0 2.443 0l3.614-3.613a2.482 2.482 0 0 1 1.744-.723h1.767l2.737 2.737a3.646 3.646 0 0 1 0 5.156l-2.736 2.736h-1.768a2.482 2.482 0 0 1-1.744-.722l-3.613-3.613a1.77 1.77 0 0 0-2.444 0l-3.6 3.6a2.483 2.483 0 0 1-1.744.722H3.791l-2.723-2.723a3.646 3.646 0 0 1 0-5.156" />
+                                    </svg>
+                                    Pix (0%)
+                                </button>
+                                <button class="btn-secondary payment-method-btn" data-method="debito"
+                                    style="flex: 1; padding: 12px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                                    </svg>
+                                    Débito
+                                </button>
+                                <button class="btn-secondary payment-method-btn active" data-method="credito"
+                                    style="flex: 1; padding: 12px; font-size: 0.95rem; border-color: var(--primary); background: rgba(99, 102, 241, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                                    </svg>
+                                    Crédito
+                                </button>
                             </div>
 
                             <!-- Conditionally Visible Credit Options -->
-                            <div id="credit-options-container" style="display: flex; flex-direction: column; gap: 20px;">
+                            <div id="credit-options-container"
+                                style="display: flex; flex-direction: column; gap: 20px;">
                                 <!-- Brand Selection -->
                                 <div class="brand-selection">
-                                    <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Bandeira do Cartão</label>
-                                    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-                                        <label class="brand-radio" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                            <input type="radio" name="card_brand" id="brand-visa-master" value="visa_master" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
-                                            <span style="font-size: 0.95rem;">Visa / Master</span>
+                                    <label
+                                        style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Bandeira
+                                        do Cartão</label>
+                                    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                                        <label class="brand-radio"
+                                            style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                            <input type="radio" name="card_brand" id="brand-visa-master"
+                                                value="visa_master" checked
+                                                style="width: 16px; height: 16px; accent-color: var(--primary);">
+                                            <div style="display: flex; align-items: center; margin-left: 4px;">
+                                                <svg viewBox="0 0 24 24" width="20" height="20"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <circle cx="9" cy="12" r="6" fill="#eb001b" fill-opacity="0.8" />
+                                                    <circle cx="15" cy="12" r="6" fill="#f79e1b" fill-opacity="0.8" />
+                                                </svg>
+                                            </div>
+                                            <span style="font-size: 0.95rem; font-weight: 500;">Visa / Master</span>
                                         </label>
-                                        <label class="brand-radio" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                            <input type="radio" name="card_brand" id="brand-other" value="other" style="width: 16px; height: 16px; accent-color: var(--primary);">
-                                            <span style="font-size: 0.95rem;">Outras</span>
+                                        <label class="brand-radio"
+                                            style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                            <input type="radio" name="card_brand" id="brand-other" value="other"
+                                                style="width: 16px; height: 16px; accent-color: var(--primary);">
+                                            <div
+                                                style="display: flex; align-items: center; margin-left: 4px; color: var(--text-secondary);">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect>
+                                                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                                                </svg>
+                                            </div>
+                                            <span style="font-size: 0.95rem; font-weight: 500;">Outras</span>
                                         </label>
                                     </div>
                                 </div>
 
                                 <!-- Installment Selection (Custom Dropdown) -->
                                 <div class="form-group" style="flex: 1;">
-                                    <label style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px; display: block;">Parcelamento</label>
+                                    <label
+                                        style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px; display: block;">Parcelamento</label>
                                     <div class="custom-select" id="installment-custom-select">
                                         <div class="select-selected">1x (À vista no crédito)</div>
                                         <div class="select-items select-hide">
@@ -136,7 +218,7 @@
                     </section>
 
                 </div>
-                
+
                 <!-- Right side: Summary Dashboard -->
                 <aside class="summary-section fade-in" style="animation-delay: 0.3s;">
                     <!-- The color of this card will change dynamically via JS -->
@@ -149,41 +231,46 @@
                         <div class="summary-details">
                             <div class="summary-row">
                                 <span>Total em Produtos</span>
-                                <span id="sum-sales" style="color: var(--text-primary); font-weight: 500;">R$ 0,00</span>
+                                <span id="sum-sales" style="color: var(--text-primary); font-weight: 500;">R$
+                                    0,00</span>
                             </div>
                             <div class="summary-row">
                                 <span>Custo dos Produtos</span>
                                 <span id="sum-costs" style="color: #ef4444;">- R$ 0,00</span>
                             </div>
                             <div class="summary-row" id="row-tradein" style="display: none;">
-                                <span>Aparelhos na Retoma</span>
+                                <span>Aparelhos na Troca</span>
                                 <span id="sum-tradein" style="color: var(--success);">(Abate) R$ 0,00</span>
                             </div>
-                            
+
                             <div class="summary-divider"></div>
-                            
-                            <div class="summary-row text-sm">
-                                <span style="color: var(--text-secondary);">Montante no Cartão</span>
-                                <span id="card-amount" style="color: var(--text-secondary);">R$ 0,00</span>
+
+                            <div class="summary-row"
+                                style="margin-bottom: 16px; margin-top: 16px; align-items: center;">
+                                <span style="font-size: 1.1rem; color: var(--text-secondary);">Valor sem Taxa</span>
+                                <span id="base-amount"
+                                    style="color: var(--text-primary); font-weight: 700; font-size: 1.5rem;">R$
+                                    0,00</span>
                             </div>
-                            <div class="summary-row">
-                                <span>Taxas da Máquina (<span id="active-fee-label">0%</span>)</span>
-                                <span id="sum-fees" style="color: #ef4444;">- R$ 0,00</span>
+
+                            <div class="summary-row" style="align-items: center;">
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <span>Taxa da Máquina (<span id="active-fee-label">0%</span>)</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary);">Repassada ao
+                                        cliente</span>
+                                </div>
+                                <span id="sum-fees" style="color: var(--text-primary); font-weight: 500;">+ R$
+                                    0,00</span>
                             </div>
                         </div>
-                        
+
                         <div class="profit-highlight">
-                            <span class="profit-label">LUCRO LÍQUIDO REAL</span>
+                            <span class="profit-label">VALOR A COBRAR (MÁQUINA)</span>
                             <div class="profit-value-wrapper">
-                                <span id="net-profit" class="profit-value">R$ 0,00</span>
-                            </div>
-                            
-                            <div class="margin-badge">
-                                <span>Margem de Lucro:</span>
-                                <strong id="profit-margin">0%</strong>
+                                <span id="card-amount" class="profit-value">R$ 0,00</span>
                             </div>
                         </div>
-                        
+
                         <div id="alert-message" class="alert-message" style="display: none;">
                             Atenção: Você está tendo prejuízo nesta venda!
                         </div>
@@ -192,7 +279,8 @@
             </div>
         </main>
     </div>
-    
+
     <script src="simulator.js"></script>
 </body>
+
 </html>

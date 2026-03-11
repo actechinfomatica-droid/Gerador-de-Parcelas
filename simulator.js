@@ -45,10 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardAmountEl = document.getElementById('card-amount');
     const activeFeeLabel = document.getElementById('active-fee-label');
     const sumFeesEl = document.getElementById('sum-fees');
-    const netProfitEl = document.getElementById('net-profit');
-    const profitMarginEl = document.getElementById('profit-margin');
     const dashboard = document.getElementById('profit-dashboard');
     const alertMessage = document.getElementById('alert-message');
+    const baseAmountEl = document.getElementById('base-amount');
 
     // --- Utility Functions ---
     const formatCurrency = (value) => {
@@ -84,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Calculate Finance
         // Montante no Cartão = Total Venda - Total Retoma (Não pode ser negativo)
         const checkAmountOnCard = totalSales - totalTradeIn;
-        const amountOnCard = checkAmountOnCard > 0 ? checkAmountOnCard : 0; 
+        const baseAmountOnCard = checkAmountOnCard > 0 ? checkAmountOnCard : 0; 
         
         if (selectedPaymentMethod === 'pix') {
             machineFeePercent = 0;
@@ -95,21 +94,27 @@ document.addEventListener('DOMContentLoaded', () => {
             machineFeePercent = rates[parseInt(selectedInstallment)] || 0;
         }
 
-        const machineFeeValue = amountOnCard * (machineFeePercent / 100);
+        // A taxa é repassada para o cliente. O Valor na Máquina = Base / (1 - Taxa)
+        let finalCardAmount = baseAmountOnCard;
+        let machineFeeValue = 0;
+        if (machineFeePercent > 0 && finalCardAmount > 0) {
+            finalCardAmount = baseAmountOnCard / (1 - (machineFeePercent / 100));
+            machineFeeValue = finalCardAmount - baseAmountOnCard;
+        }
         
-        // Lucro Líquido = Total Venda Bruta - Taxa Cartão - Custo Produtos
-        // (A retoma não entra na soma do lucro porque o valor dela já compunha o preço de venda. Ela só abate a taxa de cartão.)
-        const netProfit = totalSales - machineFeeValue - totalCosts;
+        // Lucro Líquido = Total Venda Bruta - Custo Produtos
+        // (A taxa não reduz o lucro do vendedor, pois será paga pelo cliente)
+        const netProfit = totalSales - totalCosts;
         
         let profitMargin = 0;
         if (totalSales > 0) {
             profitMargin = (netProfit / totalSales) * 100;
         }
 
-        updateDashboardUI(totalSales, totalCosts, totalTradeIn, amountOnCard, machineFeeValue, netProfit, profitMargin);
+        updateDashboardUI(totalSales, totalCosts, totalTradeIn, finalCardAmount, machineFeeValue, netProfit, profitMargin, baseAmountOnCard);
     };
 
-    const updateDashboardUI = (sales, costs, tradein, cardAmount, fees, profit, margin) => {
+    const updateDashboardUI = (sales, costs, tradein, cardAmount, fees, profit, margin, baseAmount = 0) => {
         sumSalesEl.textContent = formatCurrency(sales);
         sumCostsEl.textContent = `- ${formatCurrency(costs)}`;
         
@@ -120,12 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
             rowTradein.style.display = 'none';
         }
 
+        if (baseAmountEl) baseAmountEl.textContent = formatCurrency(baseAmount);
         cardAmountEl.textContent = formatCurrency(cardAmount);
-        sumFeesEl.textContent = `- ${formatCurrency(fees)}`;
+        sumFeesEl.textContent = `+ ${formatCurrency(fees)}`;
         activeFeeLabel.textContent = `${machineFeePercent.toFixed(2)}%`;
-        
-        netProfitEl.textContent = formatCurrency(profit);
-        profitMarginEl.textContent = `${margin.toFixed(1)}%`;
 
         // Reset classes
         dashboard.className = 'summary-card glassmorphism profit-dashboard';
@@ -181,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderTradeIn = () => {
         tradeinContainer.innerHTML = '';
         if (tradeIn.length === 0) {
-            tradeinContainer.innerHTML = '<div style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; padding: 10px;">Nenhum aparelho na retoma.</div>';
+            tradeinContainer.innerHTML = '<div style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; padding: 10px;">Nenhum aparelho na troca.</div>';
             return;
         }
 
@@ -196,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <label>Valor de Avaliação</label>
                         <input type="number" class="t-value" value="${t.value || ''}" step="0.01" placeholder="R$ 0,00">
                     </div>
-                    <button class="remove-btn remove-tradein" title="Remover Retoma">
+                    <button class="remove-btn remove-tradein" title="Remover Troca">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
