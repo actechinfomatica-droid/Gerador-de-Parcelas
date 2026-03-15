@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedBrand = 'visa_master';
     let selectedInstallment = 1;
 
+    // Extra Tax State
+    let extraTax = 0;
+    let extraTaxType = 'percent_total'; // 'percent_total', 'percent_installment'
+    let isAdvancedOpen = false;
+
     const ratesVisaMaster = {
         1: 3.65, 2: 5.09, 3: 5.78, 4: 6.59, 5: 7.10, 6: 7.91,
         7: 8.69, 8: 9.56, 9: 9.98, 10: 10.63, 11: 11.36, 12: 11.90,
@@ -36,6 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectSelected = customSelect.querySelector('.select-selected');
     const selectItems = customSelect.querySelector('.select-items');
     const options = selectItems.querySelectorAll('div');
+
+    // Advanced Settings / Extra Tax Elements
+    const toggleExtraBtn = document.getElementById('toggle-extra-btn');
+    const advancedSettings = document.getElementById('advanced-settings');
+    const extraTaxInput = document.getElementById('extra-tax');
+    const extraTypeRadios = document.querySelectorAll('input[name="extra_type"]');
 
     // Summary Elements
     const sumSalesEl = document.getElementById('sum-sales');
@@ -94,27 +105,47 @@ document.addEventListener('DOMContentLoaded', () => {
             machineFeePercent = rates[parseInt(selectedInstallment)] || 0;
         }
 
-        // A taxa é repassada para o cliente. O Valor na Máquina = Base / (1 - Taxa)
         let finalCardAmount = baseAmountOnCard;
         let machineFeeValue = 0;
-        if (machineFeePercent > 0 && finalCardAmount > 0) {
-            finalCardAmount = baseAmountOnCard / (1 - (machineFeePercent / 100));
-            machineFeeValue = finalCardAmount - baseAmountOnCard;
+        let appliedExtraPercent = 0;
+        let extraAmountForSeller = 0;
+        
+        // Se houver extraTx, calculamos o valor extra para o vendedor
+        if (extraTaxType === 'percent_total') {
+            appliedExtraPercent = extraTax;
+            extraAmountForSeller = baseAmountOnCard * (appliedExtraPercent / 100);
+        } else if (extraTaxType === 'percent_installment') {
+            // Cálculo usando Juros Compostos (Mês a Mês sobre o saldo)
+            const amountWithCompoundExtra = baseAmountOnCard * Math.pow(1 + (extraTax / 100), parseInt(selectedInstallment));
+            extraAmountForSeller = amountWithCompoundExtra - baseAmountOnCard;
+            appliedExtraPercent = (extraAmountForSeller / baseAmountOnCard) * 100;
         }
         
-        // Lucro Líquido = Total Venda Bruta - Custo Produtos
-        // (A taxa não reduz o lucro do vendedor, pois será paga pelo cliente)
-        const netProfit = totalSales - totalCosts;
+        // Repassamos a taxa da máquina em cima do valor base somado à taxa extra desejada
+        const targetAmountWithExtra = baseAmountOnCard + extraAmountForSeller;
+
+        if (machineFeePercent > 0 && targetAmountWithExtra > 0) {
+            finalCardAmount = targetAmountWithExtra / (1 - (machineFeePercent / 100));
+            // O valor total de taxas geradas é a quantia cobrada no cartão menos a quantia que o lojista receberia se não houvesse juros.
+            machineFeeValue = finalCardAmount - targetAmountWithExtra;
+        } else if (targetAmountWithExtra > 0) {
+            finalCardAmount = targetAmountWithExtra;
+        }
+        
+        // Lucro Líquido = Total Venda Bruta - Custo Produtos + Extra Cobrado
+        // (A taxa da máquina não reduz o lucro do lojista, pois será paga pelo cliente)
+        const netProfit = (totalSales + extraAmountForSeller) - totalCosts;
         
         let profitMargin = 0;
-        if (totalSales > 0) {
-            profitMargin = (netProfit / totalSales) * 100;
+        const totalSalesWithExtra = totalSales + extraAmountForSeller;
+        if (totalSalesWithExtra > 0) {
+            profitMargin = (netProfit / totalSalesWithExtra) * 100;
         }
 
-        updateDashboardUI(totalSales, totalCosts, totalTradeIn, finalCardAmount, machineFeeValue, netProfit, profitMargin, baseAmountOnCard);
+        updateDashboardUI(totalSales, totalCosts, totalTradeIn, finalCardAmount, machineFeeValue, netProfit, profitMargin, baseAmountOnCard, extraAmountForSeller);
     };
 
-    const updateDashboardUI = (sales, costs, tradein, cardAmount, fees, profit, margin, baseAmount = 0) => {
+    const updateDashboardUI = (sales, costs, tradein, cardAmount, fees, profit, margin, baseAmount = 0, extraTaxAmount = 0) => {
         sumSalesEl.textContent = formatCurrency(sales);
         sumCostsEl.textContent = `- ${formatCurrency(costs)}`;
         
@@ -129,6 +160,29 @@ document.addEventListener('DOMContentLoaded', () => {
         cardAmountEl.textContent = formatCurrency(cardAmount);
         sumFeesEl.textContent = `+ ${formatCurrency(fees)}`;
         activeFeeLabel.textContent = `${machineFeePercent.toFixed(2)}%`;
+        
+        let extraRow = document.getElementById('row-extra-tax');
+        if (!extraRow) {
+            extraRow = document.createElement('div');
+            extraRow.id = 'row-extra-tax';
+            extraRow.className = 'summary-row';
+            
+            // Insert after tradein
+            const detailsDiv = document.querySelector('.summary-details');
+            if (detailsDiv && rowTradein && rowTradein.nextElementSibling) {
+                detailsDiv.insertBefore(extraRow, rowTradein.nextElementSibling);
+            }
+        }
+
+        if (extraTaxAmount > 0 && isAdvancedOpen) {
+            extraRow.style.display = 'flex';
+            extraRow.innerHTML = `
+                <span>Taxa Extra (Para Você)</span>
+                <span style="color: var(--success);">+ ${formatCurrency(extraTaxAmount)}</span>
+            `;
+        } else {
+            extraRow.style.display = 'none';
+        }
 
         // Reset classes
         dashboard.className = 'summary-card glassmorphism profit-dashboard';
@@ -324,6 +378,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // --- Extra Settings Events ---
+    if (toggleExtraBtn) {
+        toggleExtraBtn.addEventListener('click', () => {
+            if (advancedSettings.style.display === 'none') {
+                advancedSettings.style.display = 'block';
+                toggleExtraBtn.style.opacity = '1';
+                toggleExtraBtn.style.color = 'var(--primary)';
+                isAdvancedOpen = true;
+            } else {
+                advancedSettings.style.display = 'none';
+                toggleExtraBtn.style.opacity = '0.3';
+                toggleExtraBtn.style.color = 'var(--text-secondary)';
+                isAdvancedOpen = false;
+            }
+            calculateTotals();
+        });
+    }
+
+    if (extraTypeRadios.length > 0) {
+        extraTypeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    extraTaxType = e.target.value;
+                    calculateTotals();
+                }
+            });
+        });
+    }
+
+    if (extraTaxInput) {
+        extraTaxInput.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            extraTax = isNaN(val) ? 0 : val;
+            calculateTotals();
+        });
+    }
 
     // --- Custom Dropdown Logic ---
     selectSelected.addEventListener('click', function(e) {

@@ -1,7 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const amountInput = document.getElementById('amount');
+    const toggleExtraBtn = document.getElementById('toggle-extra-btn');
+    const advancedSettings = document.getElementById('advanced-settings');
     const extraTaxInput = document.getElementById('extra-tax');
+    const extraTypeRadios = document.querySelectorAll('input[name="extra_type"]');
     const installmentsContainer = document.getElementById('installments-container');
+    
+    // Estado do painel
+    let isAdvancedOpen = false;
     const summaryProduct = document.getElementById('summary-product');
     const summaryTaxLabel = document.getElementById('summary-tax-label');
     const summaryTaxValue = document.getElementById('summary-tax-value');
@@ -31,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedInstallment = 1;
     let selectedBrand = 'visa_master';
     let taxMode = 'discount'; // 'discount' (Descontar) ou 'add' (Repassar)
+    let extraTaxType = 'percent_total'; // 'percent_total', 'percent_installment'
 
     // Formatador de Moeda
     const formatCurrency = (value) => {
@@ -49,10 +56,27 @@ document.addEventListener('DOMContentLoaded', () => {
         let buyerPays, sellerReceives;
         
         // Se houver extraTx (e estamos no modo repassar), calculamos o valor extra para o estabelecimento
-        const extraAmount = amount * (extraTx / 100);
-        
+        let extraAmountForSeller = 0;
+        let appliedExtraPercent = 0;
+
         if (mode === 'add') { // Repassar taxa
-            const targetAmountForSeller = amount + extraAmount;
+            if (extraTaxType === 'percent_total') {
+                appliedExtraPercent = extraTx;
+                extraAmountForSeller = amount * (appliedExtraPercent / 100);
+            } else if (extraTaxType === 'percent_installment') {
+                // Cálculo de juros na parcela: adiciona x% ao valor de cada parcela
+                // O lojista ganha o equivalente a "amount * ((1 + extraTx/100)^installments - 1)" 
+                // para que incida mes a mes. Outra forma simples é 
+                // Valor Final com Juros Compostos = amount * Math.pow(1 + (extraTx/100), installments)
+                // Então o extra pra loja = ValorFinal - amount
+                const amountWithCompoundExtra = amount * Math.pow(1 + (extraTx / 100), installments);
+                extraAmountForSeller = amountWithCompoundExtra - amount;
+                
+                // Representação visual na UI para % total em juros compostos
+                appliedExtraPercent = (extraAmountForSeller / amount) * 100;
+            }
+            
+            const targetAmountForSeller = amount + extraAmountForSeller;
             // O cliente paga as taxas do cartão sobre o (amount + extra)
             buyerPays = targetAmountForSeller / (1 - rate / 100);
             sellerReceives = targetAmountForSeller;
@@ -66,7 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
             sellerReceives,
             installmentValue: buyerPays / installments,
             totalRate: rate,
-            taxAmount: buyerPays - sellerReceives + (mode === 'add' ? extraAmount : 0) // a diferença entre o q pagam e recebem
+            taxAmount: buyerPays - sellerReceives + (mode === 'add' ? extraAmountForSeller : 0), // a diferença entre o q pagam e recebem
+            appliedExtraPercent: appliedExtraPercent
         };
     };
 
@@ -91,8 +116,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? `<div class="installment-interest">Taxa ${vals.totalRate.toFixed(2).replace('.', ',')}%</div>` 
                 : `<div class="installment-interest text-success">Sem juros</div>`;
             
-            const extraTaxLabel = (taxMode === 'add' && extraTax > 0)
-                ? `<div class="installment-interest" style="color: var(--primary); font-weight: 500; font-size: 0.8rem; margin-top: 2px;">+ ${extraTax.toFixed(2).replace('.', ',')}% Extra</div>`
+            let extraTaxLabelText = '';
+            // Só exibe os textos de taxa extra se o painel estiver aberto
+            if (taxMode === 'add' && extraTax > 0 && isAdvancedOpen) {
+                if (extraTaxType === 'percent_total') {
+                    extraTaxLabelText = `+ ${extraTax.toFixed(2).replace('.', ',')}% Extra`;
+                } else if (extraTaxType === 'percent_installment') {
+                    extraTaxLabelText = `+ ${vals.appliedExtraPercent.toFixed(2).replace('.', ',')}% Extra (${extraTax.toFixed(2).replace('.', ',')}%/mês)`;
+                }
+            }
+            const extraTaxLabel = extraTaxLabelText 
+                ? `<div class="installment-interest" style="color: var(--primary); font-weight: 500; font-size: 0.8rem; margin-top: 2px;">${extraTaxLabelText}</div>`
                 : '';
                 
             item.innerHTML = `
@@ -115,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary);">${formatCurrency(vals.buyerPays)}</span>
                         </div>
                         <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                            <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Você recebe</span>
+                            <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Valor a receber</span>
                             <span style="font-size: 0.95rem; font-weight: 700; color: var(--success);">${formatCurrency(vals.sellerReceives)}</span>
                         </div>
                     </div>
@@ -150,7 +184,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (summaryProduct) summaryProduct.textContent = formatCurrency(currentAmount);
         if (summaryTaxLabel) summaryTaxLabel.textContent = `Taxa Cartão (${vals.totalRate.toFixed(2).replace('.', ',')}%)`;
-        if (summaryTaxValue) summaryTaxValue.textContent = `- ${formatCurrency(vals.taxAmount - extraTaxInput.value * currentAmount / 100)}`; // display just card tax
+        if (summaryTaxValue) {
+            let extraRaw = currentAmount * (vals.appliedExtraPercent / 100);
+            summaryTaxValue.textContent = `- ${formatCurrency(vals.taxAmount - (taxMode === 'add' ? extraRaw : 0))}`; // display just card tax
+        }
         
         let extraRow = document.getElementById('summary-extra-row');
         if (!extraRow) {
@@ -166,11 +203,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        if (taxMode === 'add' && extraTax > 0) {
+        // Só exibe a linha extra no resumo se o painel estiver aberto
+        if (taxMode === 'add' && extraTax > 0 && isAdvancedOpen) {
             extraRow.style.display = 'flex';
+            
+            let extraAmountFinal = currentAmount * (vals.appliedExtraPercent / 100);
+            let extraLabel = `Extra para Você (${vals.appliedExtraPercent.toFixed(2).replace('.', ',')}%)`;
+            
             extraRow.innerHTML = `
-                <span style="color: var(--primary);">Extra para Você (${extraTax.toFixed(2).replace('.', ',')}%)</span>
-                <span style="color: var(--success);">+ ${formatCurrency(currentAmount * (extraTax / 100))}</span>
+                <span style="color: var(--primary);">${extraLabel}</span>
+                <span style="color: var(--success);">+ ${formatCurrency(extraAmountFinal)}</span>
             `;
         } else {
             extraRow.style.display = 'none';
@@ -186,6 +228,26 @@ document.addEventListener('DOMContentLoaded', () => {
             extraTaxContainer.style.display = taxMode === 'add' ? 'flex' : 'none';
         }
     };
+
+    // Toggle para configurações avançadas (Botão Engrenagem)
+    if (toggleExtraBtn) {
+        toggleExtraBtn.addEventListener('click', () => {
+            if (advancedSettings.style.display === 'none') {
+                advancedSettings.style.display = 'block';
+                toggleExtraBtn.style.opacity = '1';
+                toggleExtraBtn.style.color = 'var(--primary)';
+                isAdvancedOpen = true;
+            } else {
+                advancedSettings.style.display = 'none';
+                toggleExtraBtn.style.opacity = '0.3';
+                toggleExtraBtn.style.color = 'var(--text-secondary)';
+                isAdvancedOpen = false;
+            }
+            // Re-renderizar as parcelas e resumo com ou sem os labels
+            renderInstallments();
+            updateSelection();
+        });
+    }
 
     // Eventos de Modo (Descontar / Repassar)
     modeRadios.forEach(radio => {
@@ -209,6 +271,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Eventos Extra Tax Type (% ou %)
+    if (extraTypeRadios.length > 0) {
+        extraTypeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    extraTaxType = e.target.value;
+                    renderInstallments();
+                    updateSelection();
+                }
+            });
+        });
+    }
 
     // Eventos Extra Tax
     if (extraTaxInput) {
