@@ -219,7 +219,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (summaryInstallments) summaryInstallments.textContent = `${selectedInstallment}x`;
         if (summaryBuyer) summaryBuyer.textContent = formatCurrency(vals.buyerPays);
-        if (summarySeller) summarySeller.textContent = formatCurrency(vals.sellerReceives);
+        
+        const summaryTotalLabel = document.querySelector('.summary-total span:first-child');
+        if (isAdvancedOpen) {
+            if (summaryTotalLabel) summaryTotalLabel.textContent = "Valor a receber";
+            if (summarySeller) {
+                summarySeller.textContent = formatCurrency(vals.sellerReceives);
+                summarySeller.style.color = 'var(--success)';
+            }
+        } else {
+            if (summaryTotalLabel) summaryTotalLabel.textContent = "Valor base";
+            if (summarySeller) {
+                summarySeller.textContent = formatCurrency(currentAmount);
+                summarySeller.style.color = 'var(--success)';
+            }
+        }
     };
 
     const toggleExtraTaxVisibility = () => {
